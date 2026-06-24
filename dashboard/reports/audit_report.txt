@@ -1,0 +1,25 @@
+=================================================================
+    SECURE FILE TRANSFER MONITOR – AUDIT REPORT
+    Generated: 2026-06-25 00:03:59
+=================================================================
+
+  SUMMARY
+-----------------------------------------------------------------
+    Total events recorded       : 0
+    Sensitive file events       : 0
+    WARNING-level events        : 0
+    CRITICAL-level events       : 0
+    Unauthorized movements      : 0
+    Integrity failures (mismatch): 0
+
+  EVENT TYPE BREAKDOWN
+-----------------------------------------------------------------
+    No events recorded.
+
+  SUSPICIOUS DESTINATION BREAKDOWN
+-----------------------------------------------------------------
+    No suspicious transfers detected.
+
+=================================================================
+    END OF REPORT
+=================================================================

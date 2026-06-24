@@ -1,0 +1,88 @@
+{
+  "monitored_directories": [
+    "test_data/sensitive",
+    "test_data/normal"
+  ],
+
+  "sensitive_paths": [
+    "test_data/sensitive"
+  ],
+
+  "sensitive_extensions": [
+    ".pdf", ".docx", ".xlsx", ".pptx",
+    ".csv", ".txt", ".zip", ".tar",
+    ".key", ".pem", ".env", ".db",
+    ".sql", ".bak", ".conf", ".cfg"
+  ],
+
+  "suspicious_destinations": {
+    "usb_drives": [
+      "/media/",
+      "/mnt/",
+      "D:\\",
+      "E:\\",
+      "F:\\",
+      "G:\\"
+    ],
+    "network_shares": [
+      "\\\\",
+      "//",
+      "/net/",
+      "/smb/"
+    ],
+    "cloud_sync_folders": [
+      "Google Drive",
+      "GoogleDrive",
+      "OneDrive",
+      "Dropbox",
+      "iCloud",
+      "Box Sync",
+      "Sync.com",
+      "pCloud"
+    ],
+    "unknown_destinations": [
+      "test_data/suspicious_dest",
+      "/tmp/",
+      "C:\\Temp\\",
+      "C:\\Users\\Public\\"
+    ]
+  },
+
+  "allowed_users": [
+    "admin",
+    "monitor_user"
+  ],
+
+  "hash_algorithm": "sha256",
+
+  "log_settings": {
+    "activity_log": "logs/file_activity.log",
+    "alert_log": "logs/alerts.log",
+    "audit_csv": "logs/audit_events.csv",
+    "report_file": "reports/audit_report.txt"
+  },
+
+  "alert_settings": {
+    "print_to_terminal": true,
+    "save_to_log": true,
+    "severity_levels": {
+      "INFO": "green",
+      "WARNING": "yellow",
+      "CRITICAL": "red"
+    }
+  },
+
+  "monitoring_settings": {
+    "recursive": true,
+    "ignore_patterns": [
+      "*.tmp",
+      "*.swp",
+      "*.pyc",
+      "__pycache__",
+      ".git"
+    ],
+    "hash_on_create": true,
+    "hash_on_modify": true,
+    "hash_on_move": true
+  }
+}

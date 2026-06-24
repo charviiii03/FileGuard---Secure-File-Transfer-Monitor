@@ -1,0 +1,7 @@
+{
+  "test_data/sensitive/employee_records.txt": "c43d4f80bf6c43a9e234adc33ffb3cd60bba6fc01900bb81b696882aa41df4f4",
+  "test_data/sensitive/financial_report.csv": "9a8b4253f5d7f20d3850ca8a6ed742adddf17faf920a2fed481cc03a2d4ee709",
+  "test_data/normal/readme_normal.txt": "6348413c94470721c57381e7df07f800779d737ef94cddc484724ef57b4072d2",
+  "/Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test1.txt": "114811b0b8998cb9853a5379598021410feddf69bb2ee7b7145d052a7e9b5d45",
+  "test_data/normal/test1.txt": "114811b0b8998cb9853a5379598021410feddf69bb2ee7b7145d052a7e9b5d45"
+}
