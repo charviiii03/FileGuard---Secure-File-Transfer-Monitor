@@ -1,10 +1,9 @@
+.venv/
+.venv-1/
+venv/
 __pycache__/
 *.pyc
-.venv/
-venv/
-.env
 .DS_Store
+.env
 
-logs/*.log
-logs/*.csv
-reports/*.txt
+reports/pdf/*.pdf

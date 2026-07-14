@@ -248,6 +248,43 @@ File Event (watchdog)
 ```
 
 ---
+## ✨ Additional Features
+
+- Real-time monitoring of file creation, deletion, modification, and movement
+- SHA-256 based file integrity verification
+- Sensitive file detection using path and extension rules
+- Suspicious destination detection for unauthorized transfers
+- CSV-based audit trail for easy analysis
+- Separate alert logs for WARNING and CRITICAL events
+- Auto-generated final audit report
+- Cross-platform support for Windows, macOS, and Linux
+- Graceful error handling for missing/deleted files
+- Config-driven design for easy customization
+
+---
+
+## 🔐 Security Use Cases
+
+This project can be used for:
+
+- Monitoring confidential company documents
+- Detecting unauthorized movement of sensitive files
+- Verifying whether files were modified after baseline creation
+- Creating audit logs for internal security review
+- Demonstrating cybersecurity monitoring concepts in a portfolio project
+
+---
+
+## 🧠 Skills Demonstrated
+
+- Python automation
+- Cybersecurity monitoring
+- File integrity checking
+- SHA-256 hashing
+- Event-driven programming
+- Logging and reporting
+- Configuration-based application design
+- Audit trail generation
 
 ## 📝 Notes
 

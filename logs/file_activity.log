@@ -1,0 +1,44 @@
+# This file is auto-populated by the monitor at runtime.
+# It records every file system event detected.
+2026-06-24 18:45:14  INFO      [WARNING] CREATED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/secret.pdf
+2026-06-24 18:45:14  INFO      [WARNING] CREATED  ⚠ SENSITIVE FILE  | File: test_data/normal/notes.txt
+2026-06-24 18:45:14  INFO      [CRITICAL] MOVED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/payroll.xlsx  | Dest: /media/usb/payroll.xlsx  | ⚠ Suspicious destination (USB_DRIVE): Destination matches USB/external drive path: /media/
+2026-06-24 18:45:14  INFO      [CRITICAL] MODIFIED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/employee_records.txt  | ❌ HASH MISMATCH! stored=bbbbbbbbbbbb... current=aaaaaaaaaaaa...
+2026-06-24 18:45:34  INFO      [WARNING] CREATED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/secret.pdf
+2026-06-24 18:45:34  INFO      [INFO] CREATED  | File: test_data/normal/photo.jpg
+2026-06-24 18:45:34  INFO      [CRITICAL] MOVED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/payroll.xlsx  | Dest: /media/usb/payroll.xlsx  | ⚠ Suspicious destination (USB_DRIVE): Destination matches USB/external drive path: /media/
+2026-06-24 18:45:34  INFO      [CRITICAL] MODIFIED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/employee_records.txt  | ❌ HASH MISMATCH! stored=bbbbbbbbbbbb... current=aaaaaaaaaaaa...
+2026-06-24 22:59:17  INFO      === Secure File Transfer Monitor started at 2026-06-24 22:59:17 ===
+2026-06-24 23:05:47  INFO      === Secure File Transfer Monitor started at 2026-06-24 23:05:47 ===
+2026-06-24 23:05:59  INFO      [WARNING] CREATED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt  | ℹ New file – baseline hash recorded
+2026-06-24 23:05:59  INFO      [WARNING] MODIFIED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt  | ✔ Hash OK
+2026-06-24 23:06:08  INFO      [CRITICAL] MODIFIED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt  | ❌ HASH MISMATCH! stored=e3b0c44298fc... current=5891b5b522d5...
+2026-06-24 23:06:16  INFO      [WARNING] DELETED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt
+2026-06-24 23:07:50  INFO      === Monitor stopped at 2026-06-24 23:07:50 ===
+2026-06-24 23:08:53  INFO      === Secure File Transfer Monitor started at 2026-06-24 23:08:53 ===
+2026-06-24 23:09:06  INFO      === Secure File Transfer Monitor started at 2026-06-24 23:09:06 ===
+2026-06-24 23:09:16  INFO      [WARNING] CREATED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test1.txt  | ℹ New file – baseline hash recorded
+2026-06-24 23:09:16  INFO      [WARNING] MODIFIED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test1.txt  | ✔ Hash OK
+2026-06-24 23:19:05  INFO      === Monitor stopped at 2026-06-24 23:19:05 ===
+2026-06-24 23:28:38  INFO      === Secure File Transfer Monitor started at 2026-06-24 23:28:38 ===
+2026-06-24 23:33:39  INFO      === Monitor stopped at 2026-06-24 23:33:39 ===
+2026-06-24 23:33:55  INFO      === Secure File Transfer Monitor started at 2026-06-24 23:33:55 ===
+2026-06-24 23:43:49  INFO      === Monitor stopped at 2026-06-24 23:43:49 ===
+2026-06-24 23:51:38  INFO      === Secure File Transfer Monitor started at 2026-06-24 23:51:38 ===
+2026-06-25 00:04:16  INFO      === Monitor stopped at 2026-06-25 00:04:16 ===
+2026-06-25 00:07:33  INFO      === Secure File Transfer Monitor started at 2026-06-25 00:07:33 ===
+2026-06-25 00:08:32  INFO      === Monitor stopped at 2026-06-25 00:08:32 ===
+2026-06-25 00:10:28  INFO      === Secure File Transfer Monitor started at 2026-06-25 00:10:28 ===
+2026-06-25 00:11:32  INFO      === Monitor stopped at 2026-06-25 00:11:32 ===
+2026-07-13 23:04:16  INFO      === Secure File Transfer Monitor started at 2026-07-13 23:04:16 ===
+2026-07-13 23:45:01  INFO      === Monitor stopped at 2026-07-13 23:45:01 ===
+2026-07-13 23:47:57  INFO      === Secure File Transfer Monitor started at 2026-07-13 23:47:57 ===
+2026-07-13 23:51:23  INFO      === Monitor stopped at 2026-07-13 23:51:23 ===
+2026-07-13 23:52:51  INFO      === Secure File Transfer Monitor started at 2026-07-13 23:52:51 ===
+2026-07-13 23:59:04  INFO      === Monitor stopped at 2026-07-13 23:59:04 ===
+2026-07-13 23:59:10  INFO      === Secure File Transfer Monitor started at 2026-07-13 23:59:10 ===
+2026-07-14 20:23:36  INFO      === Monitor stopped at 2026-07-14 20:23:36 ===
+2026-07-14 20:29:09  INFO      === Secure File Transfer Monitor started at 2026-07-14 20:29:09 ===
+2026-07-14 21:13:31  INFO      === Monitor stopped at 2026-07-14 21:13:31 ===
+2026-07-14 21:20:18  INFO      === Secure File Transfer Monitor started at 2026-07-14 21:20:18 ===
+2026-07-14 21:40:27  INFO      === Monitor stopped at 2026-07-14 21:40:27 ===

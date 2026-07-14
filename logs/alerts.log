@@ -1,0 +1,15 @@
+# This file is auto-populated by the monitor at runtime.
+# Only WARNING and CRITICAL alerts are written here.
+2026-06-24 18:45:14  WARNING   [WARNING] CREATED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/secret.pdf
+2026-06-24 18:45:14  WARNING   [WARNING] CREATED  ⚠ SENSITIVE FILE  | File: test_data/normal/notes.txt
+2026-06-24 18:45:14  CRITICAL  [CRITICAL] MOVED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/payroll.xlsx  | Dest: /media/usb/payroll.xlsx  | ⚠ Suspicious destination (USB_DRIVE): Destination matches USB/external drive path: /media/
+2026-06-24 18:45:14  CRITICAL  [CRITICAL] MODIFIED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/employee_records.txt  | ❌ HASH MISMATCH! stored=bbbbbbbbbbbb... current=aaaaaaaaaaaa...
+2026-06-24 18:45:34  WARNING   [WARNING] CREATED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/secret.pdf
+2026-06-24 18:45:34  CRITICAL  [CRITICAL] MOVED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/payroll.xlsx  | Dest: /media/usb/payroll.xlsx  | ⚠ Suspicious destination (USB_DRIVE): Destination matches USB/external drive path: /media/
+2026-06-24 18:45:34  CRITICAL  [CRITICAL] MODIFIED  ⚠ SENSITIVE FILE  | File: test_data/sensitive/employee_records.txt  | ❌ HASH MISMATCH! stored=bbbbbbbbbbbb... current=aaaaaaaaaaaa...
+2026-06-24 23:05:59  WARNING   [WARNING] CREATED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt  | ℹ New file – baseline hash recorded
+2026-06-24 23:05:59  WARNING   [WARNING] MODIFIED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt  | ✔ Hash OK
+2026-06-24 23:06:08  CRITICAL  [CRITICAL] MODIFIED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt  | ❌ HASH MISMATCH! stored=e3b0c44298fc... current=5891b5b522d5...
+2026-06-24 23:06:16  WARNING   [WARNING] DELETED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt
+2026-06-24 23:09:16  WARNING   [WARNING] CREATED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test1.txt  | ℹ New file – baseline hash recorded
+2026-06-24 23:09:16  WARNING   [WARNING] MODIFIED  ⚠ SENSITIVE FILE  | File: /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test1.txt  | ✔ Hash OK

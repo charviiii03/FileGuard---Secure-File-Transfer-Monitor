@@ -1,0 +1,63 @@
+=================================================================
+    SECURE FILE TRANSFER MONITOR – AUDIT REPORT
+    Generated: 2026-07-14 21:43:39
+=================================================================
+
+  SUMMARY
+-----------------------------------------------------------------
+    Total events recorded       : 14
+    Sensitive file events       : 13
+    WARNING-level events        : 8
+    CRITICAL-level events       : 5
+    Unauthorized movements      : 2
+    Integrity failures (mismatch): 3
+
+  EVENT TYPE BREAKDOWN
+-----------------------------------------------------------------
+    created              : 6
+    deleted              : 1
+    modified             : 5
+    moved                : 2
+
+  SUSPICIOUS DESTINATION BREAKDOWN
+-----------------------------------------------------------------
+    USB_DRIVE                 : 2
+
+  INTEGRITY FAILURES (Hash Mismatches)
+-----------------------------------------------------------------
+    [2026-06-24T18:45:14.444098]  test_data/sensitive/employee_records.txt
+      Stored hash : bbbbbbbbbbbbbbbb...
+      Current hash: aaaaaaaaaaaaaaaa...
+    [2026-06-24T18:45:34.268544]  test_data/sensitive/employee_records.txt
+      Stored hash : bbbbbbbbbbbbbbbb...
+      Current hash: aaaaaaaaaaaaaaaa...
+    [2026-06-24T23:06:08.274368]  /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt
+      Stored hash : e3b0c44298fc1c14...
+      Current hash: 5891b5b522d5df08...
+
+  UNAUTHORIZED TRANSFER DETAILS
+-----------------------------------------------------------------
+    [2026-06-24T18:45:14.444026]  MOVED       USB_DRIVE             test_data/sensitive/payroll.xlsx
+      → /media/usb/payroll.xlsx
+    [2026-06-24T18:45:34.268473]  MOVED       USB_DRIVE             test_data/sensitive/payroll.xlsx
+      → /media/usb/payroll.xlsx
+
+  SENSITIVE FILE EVENTS
+-----------------------------------------------------------------
+    [2026-06-24T18:45:14.441707]  [WARNING ]  CREATED     test_data/sensitive/secret.pdf
+    [2026-06-24T18:45:14.443918]  [WARNING ]  CREATED     test_data/normal/notes.txt
+    [2026-06-24T18:45:14.444026]  [CRITICAL]  MOVED       test_data/sensitive/payroll.xlsx
+    [2026-06-24T18:45:14.444098]  [CRITICAL]  MODIFIED    test_data/sensitive/employee_records.txt
+    [2026-06-24T18:45:34.268062]  [WARNING ]  CREATED     test_data/sensitive/secret.pdf
+    [2026-06-24T18:45:34.268473]  [CRITICAL]  MOVED       test_data/sensitive/payroll.xlsx
+    [2026-06-24T18:45:34.268544]  [CRITICAL]  MODIFIED    test_data/sensitive/employee_records.txt
+    [2026-06-24T23:05:59.073434]  [WARNING ]  CREATED     /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt
+    [2026-06-24T23:05:59.075036]  [WARNING ]  MODIFIED    /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt
+    [2026-06-24T23:06:08.274368]  [CRITICAL]  MODIFIED    /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt
+    [2026-06-24T23:06:16.598161]  [WARNING ]  DELETED     /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test.txt
+    [2026-06-24T23:09:16.175187]  [WARNING ]  CREATED     /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test1.txt
+    [2026-06-24T23:09:16.176675]  [WARNING ]  MODIFIED    /Users/charvis/Downloads/secure_file_transfer_monitor/test_data/normal/test1.txt
+
+=================================================================
+    END OF REPORT
+=================================================================

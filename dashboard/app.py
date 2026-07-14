@@ -1,25 +1,29 @@
 # dashboard/app.py
-# SentinelShield Dashboard — Flask backend
-# Serves the web UI and exposes REST API endpoints that read live log/CSV data.
-#
-# Run from the project root:
-#   python dashboard/app.py
-# Then open:  http://127.0.0.1:5000
+# FileGuard Dashboard — Flask backend
+# Run:  python dashboard/app.py
+# Open: http://127.0.0.1:5001
 
-import os
 import sys
 import csv
 import json
 import datetime
 from pathlib import Path
-from flask import Flask, jsonify, render_template, send_from_directory
 
-# ── resolve project root so imports work regardless of cwd ──
+from flask import (
+    Flask,
+    jsonify,
+    render_template,
+    send_from_directory,
+    url_for,
+)
+
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from src.utils   import load_config
+from src.utils import load_config
 from src.reporter import generate_report
+from src.pdf_reporter import create_pdf_report
+
 
 app = Flask(
     __name__,
@@ -27,196 +31,405 @@ app = Flask(
     static_folder="static",
 )
 
-# ──────────────────────────────────────────────
-# CONFIG
-# ──────────────────────────────────────────────
+# Folder in which generated PDF reports will be stored.
+PDF_REPORT_DIR = ROOT / "reports" / "pdf"
+PDF_REPORT_DIR.mkdir(parents=True, exist_ok=True)
+
+
+# ── CONFIG ───────────────────────────────────────────────────────────────────
 
 def _cfg():
     try:
         return load_config(str(ROOT / "config" / "config.json"))
-    except Exception:
+    except Exception as exc:
+        print(f"[FileGuard] Could not load configuration: {exc}")
         return {}
 
 
 def _csv_path():
     cfg = _cfg()
-    return ROOT / cfg.get("log_settings", {}).get("audit_csv", "logs/audit_events.csv")
+    return ROOT / cfg.get(
+        "log_settings", {}
+    ).get(
+        "audit_csv",
+        "logs/audit_events.csv",
+    )
 
 
 def _alert_log_path():
     cfg = _cfg()
-    return ROOT / cfg.get("log_settings", {}).get("alert_log", "logs/alerts.log")
+    return ROOT / cfg.get(
+        "log_settings", {}
+    ).get(
+        "alert_log",
+        "logs/alerts.log",
+    )
 
 
 def _activity_log_path():
     cfg = _cfg()
-    return ROOT / cfg.get("log_settings", {}).get("activity_log", "logs/file_activity.log")
+    return ROOT / cfg.get(
+        "log_settings", {}
+    ).get(
+        "activity_log",
+        "logs/file_activity.log",
+    )
 
 
-# ──────────────────────────────────────────────
-# HELPERS
-# ──────────────────────────────────────────────
+# ── HELPERS ──────────────────────────────────────────────────────────────────
 
 def _read_csv():
-    """Return all audit CSV rows as a list of dicts."""
     path = _csv_path()
+
     if not path.exists():
         return []
+
     rows = []
-    with open(path, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            rows.append(row)
+
+    try:
+        with open(path, newline="", encoding="utf-8") as file:
+            for row in csv.DictReader(file):
+                rows.append(row)
+    except Exception as exc:
+        print(f"[FileGuard] Could not read audit CSV: {exc}")
+
     return rows
 
 
 def _read_log_tail(path, n=200):
-    """Return last N lines of a log file."""
     if not path.exists():
         return []
-    with open(path, encoding="utf-8", errors="replace") as f:
-        lines = f.readlines()
-    return [l.rstrip() for l in lines[-n:]]
+
+    try:
+        with open(path, encoding="utf-8", errors="replace") as file:
+            lines = file.readlines()
+
+        return [line.rstrip() for line in lines[-n:]]
+    except Exception as exc:
+        print(f"[FileGuard] Could not read log file: {exc}")
+        return []
 
 
 def _compute_stats(rows):
     from collections import Counter
-    total        = len(rows)
-    sensitive    = [r for r in rows if r.get("is_sensitive","").lower() == "true"]
-    criticals    = [r for r in rows if r.get("severity") == "CRITICAL"]
-    warnings     = [r for r in rows if r.get("severity") == "WARNING"]
-    mismatches   = [r for r in rows if r.get("hash_status") == "MISMATCH"]
-    unauthorized = [r for r in rows if r.get("dest_category") not in ("NORMAL","","None")]
 
-    event_counts = Counter(r.get("event_type","unknown") for r in rows)
-    dest_counts  = Counter(
-        r.get("dest_category","NORMAL")
-        for r in rows
-        if r.get("dest_category") not in ("NORMAL","","None")
+    total = len(rows)
+
+    sensitive = [
+        row
+        for row in rows
+        if row.get("is_sensitive", "").lower() == "true"
+    ]
+
+    criticals = [
+        row
+        for row in rows
+        if row.get("severity", "").upper() == "CRITICAL"
+    ]
+
+    warnings = [
+        row
+        for row in rows
+        if row.get("severity", "").upper() == "WARNING"
+    ]
+
+    mismatches = [
+        row
+        for row in rows
+        if row.get("hash_status", "").upper() == "MISMATCH"
+    ]
+
+    unauthorized = [
+        row
+        for row in rows
+        if row.get("dest_category") not in (
+            "NORMAL",
+            "",
+            None,
+            "None",
+        )
+    ]
+
+    event_counts = Counter(
+        row.get("event_type", "unknown")
+        for row in rows
     )
-    severity_counts = Counter(r.get("severity","INFO") for r in rows)
 
-    # Timeline: events per minute (last 60 minutes)
+    dest_counts = Counter(
+        row.get("dest_category", "NORMAL")
+        for row in rows
+        if row.get("dest_category") not in (
+            "NORMAL",
+            "",
+            None,
+            "None",
+        )
+    )
+
+    severity_counts = Counter(
+        row.get("severity", "INFO")
+        for row in rows
+    )
+
     timeline = {}
-    now = datetime.datetime.now()
-    for r in rows:
-        ts_str = r.get("timestamp","")
+
+    for row in rows:
+        timestamp_text = row.get("timestamp", "")
+
         try:
-            ts = datetime.datetime.fromisoformat(ts_str)
-            bucket = ts.strftime("%H:%M")
+            timestamp = datetime.datetime.fromisoformat(timestamp_text)
+            bucket = timestamp.strftime("%H:%M")
             timeline[bucket] = timeline.get(bucket, 0) + 1
-        except Exception:
-            pass
+        except (TypeError, ValueError):
+            continue
 
     return {
-        "total":             total,
-        "sensitive_count":   len(sensitive),
-        "critical_count":    len(criticals),
-        "warning_count":     len(warnings),
-        "integrity_fails":   len(mismatches),
-        "unauthorized":      len(unauthorized),
-        "event_counts":      dict(event_counts),
-        "dest_counts":       dict(dest_counts),
-        "severity_counts":   dict(severity_counts),
-        "timeline":          timeline,
+        "total": total,
+        "sensitive_count": len(sensitive),
+        "critical_count": len(criticals),
+        "warning_count": len(warnings),
+        "integrity_fails": len(mismatches),
+        "unauthorized": len(unauthorized),
+        "event_counts": dict(event_counts),
+        "dest_counts": dict(dest_counts),
+        "severity_counts": dict(severity_counts),
+        "timeline": timeline,
     }
 
 
-# ──────────────────────────────────────────────
-# ROUTES — Pages
-# ──────────────────────────────────────────────
+# ── ROUTES — PAGE ────────────────────────────────────────────────────────────
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
-# ──────────────────────────────────────────────
-# ROUTES — API
-# ──────────────────────────────────────────────
+# ── ROUTES — API ─────────────────────────────────────────────────────────────
 
 @app.route("/api/stats")
 def api_stats():
-    rows = _read_csv()
-    return jsonify(_compute_stats(rows))
+    return jsonify(_compute_stats(_read_csv()))
 
 
 @app.route("/api/events")
 def api_events():
-    """Return all audit events, newest first."""
     rows = _read_csv()
     rows.reverse()
-    return jsonify(rows[:500])  # cap at 500 for browser performance
+    return jsonify(rows[:500])
 
 
 @app.route("/api/alerts")
 def api_alerts():
-    """Return last 200 lines of the alert log."""
-    lines = _read_log_tail(_alert_log_path(), 200)
-    return jsonify({"lines": lines})
+    return jsonify({
+        "lines": _read_log_tail(_alert_log_path(), 200),
+    })
 
 
 @app.route("/api/activity")
 def api_activity():
-    """Return last 200 lines of the activity log."""
-    lines = _read_log_tail(_activity_log_path(), 200)
-    return jsonify({"lines": lines})
+    return jsonify({
+        "lines": _read_log_tail(_activity_log_path(), 200),
+    })
 
 
 @app.route("/api/config")
 def api_config():
-    """Return sanitised config (no internal paths)."""
     cfg = _cfg()
-    safe = {
-        "monitored_directories": cfg.get("monitored_directories", []),
-        "sensitive_paths":       cfg.get("sensitive_paths", []),
-        "sensitive_extensions":  cfg.get("sensitive_extensions", []),
-        "hash_algorithm":        cfg.get("hash_algorithm", "sha256"),
-        "allowed_users":         cfg.get("allowed_users", []),
-        "monitoring_settings":   cfg.get("monitoring_settings", {}),
-    }
-    return jsonify(safe)
+
+    return jsonify({
+        "monitored_directories": cfg.get(
+            "monitored_directories",
+            [],
+        ),
+        "sensitive_paths": cfg.get(
+            "sensitive_paths",
+            [],
+        ),
+        "sensitive_extensions": cfg.get(
+            "sensitive_extensions",
+            [],
+        ),
+        "hash_algorithm": cfg.get(
+            "hash_algorithm",
+            "sha256",
+        ),
+        "allowed_users": cfg.get(
+            "allowed_users",
+            [],
+        ),
+        "monitoring_settings": cfg.get(
+            "monitoring_settings",
+            {},
+        ),
+    })
 
 
 @app.route("/api/baseline")
 def api_baseline():
-    """Return the stored hash baseline."""
-    bl_path = ROOT / "logs" / "hash_baseline.json"
-    if not bl_path.exists():
-        return jsonify({})
-    with open(bl_path, encoding="utf-8") as f:
-        return jsonify(json.load(f))
+    baseline_path = ROOT / "logs" / "hash_baseline.json"
 
+    if not baseline_path.exists():
+        return jsonify({})
+
+    try:
+        with open(baseline_path, encoding="utf-8") as file:
+            return jsonify(json.load(file))
+    except (OSError, json.JSONDecodeError) as exc:
+        return jsonify({
+            "success": False,
+            "error": f"Could not read baseline file: {exc}",
+        }), 500
+
+
+# ── TEXT REPORT ──────────────────────────────────────────────────────────────
 
 @app.route("/api/report/generate", methods=["POST"])
 def api_generate_report():
-    """Trigger report generation and return the report text."""
-    cfg = _cfg()
+    """
+    Generate the normal text report and return it for dashboard preview.
+    """
     try:
-        path = generate_report(config=cfg, print_report=False)
-        with open(path, encoding="utf-8") as f:
-            text = f.read()
-        return jsonify({"success": True, "report": text, "path": str(path)})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        report_path = Path(
+            generate_report(
+                config=_cfg(),
+                print_report=False,
+            )
+        )
+
+        report_text = report_path.read_text(
+            encoding="utf-8",
+            errors="replace",
+        )
+
+        return jsonify({
+            "success": True,
+            "report": report_text,
+            "path": str(report_path),
+        })
+
+    except Exception as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc),
+        }), 500
+
+
+# ── PDF REPORT ───────────────────────────────────────────────────────────────
+
+@app.route("/api/report/pdf/generate", methods=["POST"])
+def api_generate_pdf_report():
+    """
+    Generate a fresh text report, convert it to PDF, and return
+    the URL that the frontend can use to download it.
+    """
+    try:
+        # First create/update the normal text audit report.
+        text_report_path = Path(
+            generate_report(
+                config=_cfg(),
+                print_report=False,
+            )
+        )
+
+        report_text = text_report_path.read_text(
+            encoding="utf-8",
+            errors="replace",
+        )
+
+        # Use a unique timestamp so previous reports are not overwritten.
+        timestamp = datetime.datetime.now().strftime(
+            "%Y%m%d_%H%M%S_%f"
+        )
+
+        filename = (
+            f"fileguard_security_report_{timestamp}.pdf"
+        )
+
+        pdf_path = PDF_REPORT_DIR / filename
+
+        # Convert the text report into a downloadable PDF.
+        create_pdf_report(
+            report_text=report_text,
+            output_path=pdf_path,
+        )
+
+        return jsonify({
+            "success": True,
+            "message": "PDF report generated successfully.",
+            "report": report_text,
+            "filename": filename,
+            "download_url": url_for(
+                "api_download_pdf_report",
+                filename=filename,
+            ),
+        })
+
+    except Exception as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc),
+        }), 500
+
+
+@app.route("/api/report/pdf/download/<path:filename>")
+def api_download_pdf_report(filename):
+    """
+    Download a previously generated PDF report.
+    """
+
+    # Remove directory components to prevent path traversal.
+    safe_filename = Path(filename).name
+
+    if safe_filename != filename:
+        return jsonify({
+            "success": False,
+            "error": "Invalid report filename.",
+        }), 400
+
+    if not safe_filename.lower().endswith(".pdf"):
+        return jsonify({
+            "success": False,
+            "error": "Only PDF reports can be downloaded.",
+        }), 400
+
+    report_path = PDF_REPORT_DIR / safe_filename
+
+    if not report_path.is_file():
+        return jsonify({
+            "success": False,
+            "error": "The requested PDF report was not found.",
+        }), 404
+
+    return send_from_directory(
+        directory=str(PDF_REPORT_DIR),
+        path=safe_filename,
+        as_attachment=True,
+        download_name=safe_filename,
+        mimetype="application/pdf",
+    )
 
 
 @app.route("/api/health")
 def api_health():
     return jsonify({
-        "status":    "ok",
+        "status": "ok",
         "timestamp": datetime.datetime.now().isoformat(),
-        "version":   "1.0.0",
+        "version": "2.1.0",
+        "pdf_reports": True,
     })
 
 
-# ──────────────────────────────────────────────
-# MAIN
-# ──────────────────────────────────────────────
+# ── MAIN ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("\n  ╔═══════════════════════════════════════╗")
-    print("  ║   SentinelShield Dashboard v1.0       ║")
-    print("  ║   http://127.0.0.1:5000               ║")
-    print("  ╚═══════════════════════════════════════╝\n")
-    app.run(debug=True, host="127.0.0.1", port=5000)
+    print("\n  ╔══════════════════════════════════════════╗")
+    print("  ║   FileGuard Dashboard v2.1              ║")
+    print("  ║   http://127.0.0.1:5001                 ║")
+    print("  ║   PDF report generation enabled         ║")
+    print("  ╚══════════════════════════════════════════╝\n")
+
+    app.run(
+        debug=True,
+        host="127.0.0.1",
+        port=5001,
+    )
